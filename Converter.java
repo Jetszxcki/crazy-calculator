@@ -78,7 +78,7 @@ public class Converter {
 					result = errMessage;
 					break;
 				}else if(current.equals("+") || current.equals("-")) {
-					  if(previousOperator != "")
+					  if(previousOperator != "" && stack.elements != 0)
 						result += stack.pop();
 			//		  	checkPop++;
 					stack.push(current);
