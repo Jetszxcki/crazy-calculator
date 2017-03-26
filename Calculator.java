@@ -5,7 +5,12 @@ import java.awt.*;
 @SuppressWarnings("serial")
 
 public class Calculator extends JFrame implements ActionListener {
-
+	
+	private String[] numImgs = {"images/0.png", "images/1.png", "images/2.png", "images/3.png", "images/4.png", "images/5.png", 
+				    "images/6.png", "images/7.png", "images/8.png", "images/9.png"};
+	private	String[] operatorImgs = {"images/divide.png", "images/multiply.png", "images/subtract.png", "images/add.png", "images/equals.png"};
+	private	String[] otherImgs = {"images/off.png", "images/clear.png", "images/backspace.png", "images/openParenthesis.png", "images/closeParenthesis.png"};
+	
 	private JLabel heading = new JLabel("CRAZY CALCULATOR", SwingConstants.CENTER);
 	private JButton[] otherButtons = new JButton[5];
 	private JButton[] operators = new JButton[5];
@@ -50,6 +55,7 @@ public class Calculator extends JFrame implements ActionListener {
 		JPanel numPanel = new JPanel();
 		JPanel right = new JPanel();
 		JPanel snapshot = new JPanel();
+		JPanel[] panels = { operatorPanel, topNumPanel, centerPanel, screenPanel, mainPanel, numPanel, snapshot, right};
 		
 		heading.setFont(new Font("Eras Bold ITC", Font.BOLD, 20));
 		heading.setForeground(Color.WHITE);
@@ -65,15 +71,7 @@ public class Calculator extends JFrame implements ActionListener {
 		screenPanel.setLayout(new BorderLayout(5,5));
 		mainPanel.setLayout(new BorderLayout(5,10));
 		numPanel.setLayout(new GridLayout(4,3,7,7));
-		
-		JPanel[] panels = { operatorPanel, topNumPanel, centerPanel, screenPanel, mainPanel, numPanel, snapshot, right};
-		String[] numImgs = {"images/0.png", "images/1.png", "images/2.png", "images/3.png", "images/4.png", 
-							"images/5.png", "images/6.png", "images/7.png", "images/8.png", "images/9.png"};
-		String[] operatorImgs = {"images/divide.png", "images/multiply.png", "images/subtract.png",
-								 "images/add.png", "images/equals.png"};
-		String[] otherImgs = {"images/off.png", "images/clear.png", "images/backspace.png", 
-						      "images/openParenthesis.png", "images/closeParenthesis.png"};
-								
+											
 		Color c = Color.BLACK; 
 		for(int x = 0; x < panels.length; x++)
 			panels[x].setBackground(c);
@@ -98,6 +96,8 @@ public class Calculator extends JFrame implements ActionListener {
 			
 			operators[k].addActionListener(this);
 			otherButtons[k].addActionListener(this);
+			operators[k].addMouseListener(new MouseHandler());
+			otherButtons[k].addMouseListener(new MouseHandler());
 			operatorPanel.add(operators[k]);
 			
 			if(k < 3) 
@@ -105,6 +105,10 @@ public class Calculator extends JFrame implements ActionListener {
 			else numPanel.add(otherButtons[k]);
 		}
 		
+		for(int l = 0; l < 10; l++) {
+			digits[l].addActionListener(this);
+			digits[l].addMouseListener(new MouseHandler());
+		}
 		
 		centerPanel.add(topNumPanel, BorderLayout.NORTH);
 		centerPanel.add(numPanel, BorderLayout.CENTER);
@@ -121,10 +125,7 @@ public class Calculator extends JFrame implements ActionListener {
 		add(mainPanel, BorderLayout.CENTER);
 		add(right, BorderLayout.EAST);
 		add(snapshot, BorderLayout.WEST);
-
-		for(int l = 0; l < 10; l++)
-			digits[l].addActionListener(this);
-		
+	
 	}	
 	
 	private void addToString(String s) {
@@ -188,6 +189,36 @@ public class Calculator extends JFrame implements ActionListener {
 			else if(x < 4 && e.getSource() == operators[x]) {
 				String[] symbols = {"/", "x", "-", "+"};
 				addToString(symbols[x]);
+			}
+		}
+		
+	}
+	
+	private class MouseHandler extends MouseAdapter {
+				
+		public void mousePressed(MouseEvent m) {
+			String[] nums = {"0(2).png", "1(2).png", "2(2).png", "3(2).png", "4(2).png", "5(2).png", "6(2).png", "7(2).png", "8(2).png", "9(2).png"};
+			String[] operations = {"divide(2).png", "multiply(2).png", "subtract(2).png", "add(2).png", "equals(2).png"};
+			String[] others = {"off(2).png", "clear(2).png", "backspace(2).png", "openP(2).png", "closeP(2).png"};
+			
+			for(int x = 0; x < digits.length; x++) {
+				if(m.getSource() == digits[x]) 
+					digits[x].setIcon(new ImageIcon("images/" + nums[x]));
+				else if(x < 5 && m.getSource() == operators[x])
+					operators[x].setIcon(new ImageIcon("images/" + operations[x]));
+				else if(x < 5 && m.getSource() == otherButtons[x])
+					otherButtons[x].setIcon(new ImageIcon("images/" + others[x]));
+			}
+		}
+		
+		public void mouseReleased(MouseEvent m) {
+			for(int y = 0; y < digits.length; y++) {
+				if(m.getSource() == digits[y])
+					digits[y].setIcon(new ImageIcon(numImgs[y]));
+				else if(y < 5 && m.getSource() == operators[y])
+					operators[y].setIcon(new ImageIcon(operatorImgs[y]));
+				else if(y < 5 && m.getSource() == otherButtons[y])
+					otherButtons[y].setIcon(new ImageIcon(otherImgs[y]));
 			}
 		}
 		
