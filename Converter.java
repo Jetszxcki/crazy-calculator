@@ -78,7 +78,7 @@ public class Converter {
 					result = errMessage;
 					break;
 				}else if(current.equals("+") || current.equals("-")) {
-					  if(previousOperator != "")
+					  if(previousOperator != "" && stack.elements != 0)
 						result += stack.pop();
 			//		  	checkPop++;
 					stack.push(current);
@@ -97,7 +97,7 @@ public class Converter {
 				if(x == inputString.length()-1) {
 					result = errMessage;
 					break;
-				}else if(previousChar.equals("") || isOperand(previousChar) || previousChar.equals(")"))
+				}else if(x != 0 && previousChar.equals("") && isOperand(previousChar) && previousChar.equals(")"))
 					stack.push("x");
 				
 				left++;
