@@ -2,7 +2,7 @@
 public class Converter {
 	
 	private String errMessage = "SYNTAX ERROR";
-	private String mathErr = "MATH ERROR (C/0)";
+	private String mathErr = "MATH ERROR";
 	private String result = "";
 	private String inputString;
 	private int right = 0;
