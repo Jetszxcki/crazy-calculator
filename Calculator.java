@@ -6,10 +6,10 @@ import java.awt.*;
 
 public class Calculator extends JFrame implements ActionListener {
 	
+	private String[] operatorImgs = {"images/divide.png", "images/multiply.png", "images/subtract.png", "images/add.png", "images/equals.png"};
+	private String[] otherImgs = {"images/off.png", "images/clear.png", "images/backspace.png", "images/openParenthesis.png", "images/closeParenthesis.png"};
 	private String[] numImgs = {"images/0.png", "images/1.png", "images/2.png", "images/3.png", "images/4.png", "images/5.png", 
-				    "images/6.png", "images/7.png", "images/8.png", "images/9.png"};
-	private	String[] operatorImgs = {"images/divide.png", "images/multiply.png", "images/subtract.png", "images/add.png", "images/equals.png"};
-	private	String[] otherImgs = {"images/off.png", "images/clear.png", "images/backspace.png", "images/openParenthesis.png", "images/closeParenthesis.png"};
+								"images/6.png", "images/7.png", "images/8.png", "images/9.png"};
 	
 	private JLabel heading = new JLabel("CRAZY CALCULATOR", SwingConstants.CENTER);
 	private JButton[] otherButtons = new JButton[5];
@@ -19,6 +19,7 @@ public class Calculator extends JFrame implements ActionListener {
 	public static JTextArea screen;
 	private Converter convert;
 	
+	private String ss = "READ|    PARSED   |   WRITTEN   |     STACK\n";
 	private String string = "0";
 	private int fontSize = 50;
 	private int ctr = 27;
@@ -71,7 +72,7 @@ public class Calculator extends JFrame implements ActionListener {
 		screenPanel.setLayout(new BorderLayout(5,5));
 		mainPanel.setLayout(new BorderLayout(5,10));
 		numPanel.setLayout(new GridLayout(4,3,7,7));
-											
+										
 		Color c = Color.BLACK; 
 		for(int x = 0; x < panels.length; x++)
 			panels[x].setBackground(c);
@@ -108,7 +109,7 @@ public class Calculator extends JFrame implements ActionListener {
 		for(int l = 0; l < 10; l++) {
 			digits[l].addActionListener(this);
 			digits[l].addMouseListener(new MouseHandler());
-		}
+		}			
 		
 		centerPanel.add(topNumPanel, BorderLayout.NORTH);
 		centerPanel.add(numPanel, BorderLayout.CENTER);
@@ -125,7 +126,7 @@ public class Calculator extends JFrame implements ActionListener {
 		add(mainPanel, BorderLayout.CENTER);
 		add(right, BorderLayout.EAST);
 		add(snapshot, BorderLayout.WEST);
-	
+		
 	}	
 	
 	private void addToString(String s) {
@@ -149,12 +150,17 @@ public class Calculator extends JFrame implements ActionListener {
 		
 		if(e.getSource() == otherButtons[0]) 
 			System.exit(0);
+			
 		else if(e.getSource() == otherButtons[1]) {
 			convert = new Converter();
+			snapshotScreen.setText(ss);
 			screen.setText("0");
 			string = "0";
-		}else if(e.getSource() == otherButtons[2]) {			
-			try {				
+			
+		}else if(e.getSource() == otherButtons[2]) {	
+			screen.setText("");
+			snapshotScreen.setText(ss);
+			try {			
 				StringBuilder sb = new StringBuilder(string);
 				sb.deleteCharAt(string.length()-1);
 				string = sb.toString();
@@ -169,18 +175,17 @@ public class Calculator extends JFrame implements ActionListener {
 		
 		else if(e.getSource() == otherButtons[3]) input("(");
 		else if(e.getSource() == otherButtons[4]) input(")");
+		
 		else if(e.getSource() == operators[4]) {
-			snapshotScreen.setText("READ|    PARSED   |   WRITTEN   |     STACK\n");
+			snapshotScreen.setText(ss);
 			try{
 				convert = new Converter(string);
 				String result = convert.toPostFix();
-				if(result.equals("MATH ERROR") || result.equals("SYNTAX ERROR"))
-					screen.setText(result + "\n\n=> " + string);
-				else screen.setText(string + "\n\n\nPF:" + result + "\nA: " + convert.evaluate(result));				
+				screen.setText(result);			
 			}catch(NullPointerException np) {
 				screen.setText(string + "\n\nPF:(" + string + ")\nA: " + string);
 			}
-			string = "0";
+			//string = "0";
 		}
 		
 		for(int x = 0; x < 10; x++) {
@@ -194,8 +199,9 @@ public class Calculator extends JFrame implements ActionListener {
 		
 	}
 	
+	
 	private class MouseHandler extends MouseAdapter {
-				
+		
 		public void mousePressed(MouseEvent m) {
 			String[] nums = {"0(2).png", "1(2).png", "2(2).png", "3(2).png", "4(2).png", "5(2).png", "6(2).png", "7(2).png", "8(2).png", "9(2).png"};
 			String[] operations = {"divide(2).png", "multiply(2).png", "subtract(2).png", "add(2).png", "equals(2).png"};
@@ -223,5 +229,6 @@ public class Calculator extends JFrame implements ActionListener {
 		}
 		
 	}
+	
 	
 }
