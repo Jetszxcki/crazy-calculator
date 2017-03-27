@@ -2,7 +2,7 @@
 public class Converter {
 	
 	private String errMessage = "SYNTAX ERROR";
-	private String mathErr = "MATH ERROR";
+	private String mathErr = "MATH ERROR (C/0)";
 	private String result = "";
 	private String inputString;
 	private int right = 0;
@@ -16,56 +16,19 @@ public class Converter {
 		this.inputString = inputString;
 		stack = new Stack();
 		
+	}	
+	
+	public boolean isOperator(String s) {
+		return s.equals("+") || s.equals("-") || s.equals("x") || s.equals("/");
 	}
 	
-	public double evaluate(String postFix) {
-		
-		int addedElements = 0;
-		double answer = 0.0;
-		double temp = 0.0;
-		
-		for(int x = 0; x < postFix.length(); x++) {
-			String current = String.valueOf(postFix.charAt(x));
-			if(isOperand(current)) {
-				stack.push(current);
-				addedElements++;
-				
-			}else if(current.equals(")")) {
-				int exponent = 0, limit = 0;
-				while(addedElements > limit++) {
-					temp += Math.pow(10,exponent)*(Double.parseDouble(stack.pop()));
-					exponent++;
-				}
-				stack.push(String.valueOf(temp));
-				addedElements = 0;
-				temp = 0.0;
-				
-			}else if(isOperator(current)) {
-				double num1 = Double.parseDouble(stack.pop());
-				double num2 = Double.parseDouble(stack.pop());
-				
-				if(current.equals("+")) 
-					answer = num1 + num2;
-				else if(current.equals("-")) 
-					answer = num2 - num1;
-				else if(current.equals("x")) 
-					answer = num1 * num2;
-				else if(current.equals("/")) {
-					if(num1 == 0) {
-						//result = "MATH ERROR";
-						break;
-					}else answer = num2 / num1;
-				}
-				stack.push(String.valueOf(answer));
-			}
-		}
-		
-		return answer;
+	public boolean isOperand(String s) {
+		return !s.equals("(") && !s.equals(")") && !isOperator(s);
 	}
-  
+	  
 
 	public String toPostFix() {
-	//	int check=0, checkPop=0;
+
 		String temp = "(", infix = "", previousChar = "", previousOperator = "";
 		String space = "           ";
 		
@@ -73,31 +36,25 @@ public class Converter {
 			String current = String.valueOf(inputString.charAt(x));
 
 			if(isOperator(current)) {
-		//		check++;
 				if(x == 0 || x == inputString.length()-1 || isOperator(previousChar) || previousChar.equals("(")) {
 					result = errMessage;
 					break;
 				}else if(current.equals("+") || current.equals("-")) {
 					  if(previousOperator != "" && stack.elements != 0)
 						result += stack.pop();
-			//		  	checkPop++;
 					stack.push(current);
 				}else if(current.equals("/") || current.equals("x")) {
 					if(previousOperator.equals("/") || previousOperator.equals("x"))
 						result += stack.pop();
-						//checkPop++;
 					stack.push(current);
 				}
-//				if(check>2&&checkPop!=0){
-	//				result+=stack.pop();
-		//		}
 				previousOperator = current;
 				
 			}else if(current.equals("(")) {
 				if(x == inputString.length()-1) {
 					result = errMessage;
 					break;
-				}else if(x != 0 && previousChar.equals("") && isOperand(previousChar) && previousChar.equals(")"))
+				}else if(x == 0 && previousChar.equals("") && isOperand(previousChar) && previousChar.equals(")"))
 					stack.push("x");
 				
 				left++;
@@ -159,19 +116,65 @@ public class Converter {
 			previousChar = current;
         }
 		       
-		if(left == right)
-			return result;
+//+++++++++++++++++++++  EVALUATION  +++++++++++++++++++++++++++++++++++++
+		
+		int addedElements = 0;
+		double answer = 0.0;
+		double temp2 = 0.0;
+		
+		for(int x = 0; x < result.length(); x++) {
+			
+			String current = String.valueOf(result.charAt(x));
+			
+			if(isOperand(current)) {
+				stack.push(current);
+				addedElements++;
+				
+			}else if(current.equals(")")) {
+				int exponent = 0, limit = 0;
+				while(addedElements > limit++) {
+					temp2 += Math.pow(10,exponent)*(Double.parseDouble(stack.pop()));
+					exponent++;
+				}
+				stack.push(String.valueOf(temp2));
+				addedElements = 0;
+				temp2 = 0.0;
+				
+			}else if(isOperator(current)) {
+				double num1 = Double.parseDouble(stack.pop());
+				double num2 = Double.parseDouble(stack.pop());
+				
+				if(current.equals("+")) 
+					answer = num1 + num2;
+				else if(current.equals("-")) 
+					answer = num2 - num1;
+				else if(current.equals("x")) 
+					answer = num1 * num2;
+				else if(current.equals("/")) {
+					if(num1 == 0) {
+						result = mathErr;
+						break;
+					}else answer = num2 / num1;
+				}
+				stack.push(String.valueOf(answer));
+			} 
+			
+		}		
+		
+		
+		if(left == right) {
+			String finalOutput = "";
+			if(result.equals(errMessage) || result.equals(mathErr))
+				finalOutput = result + "\n\n=> " + inputString;
+			else finalOutput = inputString + "\n\n\nPF: " + result + "\nA:  " + String.valueOf(answer);
+			
+			return finalOutput;
+		}
+		
 		return errMessage;
 		
     }	
-	
-	
-	public boolean isOperator(String s) {
-		return s.equals("+") || s.equals("-") || s.equals("x") || s.equals("/");
-	}
-	
-	public boolean isOperand(String s) {
-		return !s.equals("(") && !s.equals(")") && !isOperator(s);
-	}
+
+
 		
 }
