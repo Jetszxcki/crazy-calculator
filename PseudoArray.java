@@ -55,12 +55,13 @@ public class PseudoArray {
 		
 		Link current = first;
 		
-		//Calculator.snapshotScreen.append("\n\nSTACK : ");
 		while(current != null) {
-			Calculator.snapshotScreen.append(current.getItem());
+			Calculator.snapshotScreens[3].setText(Calculator.snapshotScreens[3].getText() + current.getItem());
+			System.out.print(current.getItem());
 			current = current.next;
 		}
-		Calculator.snapshotScreen.append("\n");
+		Calculator.snapshotScreens[3].setText(Calculator.snapshotScreens[3].getText() + "\n");
+		System.out.println();
 		
 	}
 	
