@@ -110,7 +110,10 @@ public class Converter {
 				space = sb.toString();
 			}catch(StringIndexOutOfBoundsException s) {}
 			
-			Calculator.snapshotScreen.append("  " + current + " | " + infix + space + " | " + result + "     " + " | ");
+			Calculator.snapshotScreens[0].setText(Calculator.snapshotScreens[0].getText() + current + "\n");
+			Calculator.snapshotScreens[1].setText(Calculator.snapshotScreens[1].getText() + infix + "\n");
+			Calculator.snapshotScreens[2].setText(Calculator.snapshotScreens[2].getText() + result + "\n");
+			System.out.print("  " + current + " | " + infix + space + " | " + result + "     " + " | ");
 			stack.display();
 	
 			previousChar = current;
