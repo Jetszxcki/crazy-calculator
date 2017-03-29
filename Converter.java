@@ -164,12 +164,13 @@ public class Converter {
 			
 		}		
 		
+		String finalAnswer = roundOff(answer);
 		
 		if(left == right) {
 			String finalOutput = "";
 			if(result.equals(errMessage) || result.equals(mathErr))
 				finalOutput = result + "\n\n=> " + inputString;
-			else finalOutput = inputString + "\n\n\nPF: " + result + "\nA:  " + String.valueOf(answer);
+			else finalOutput = inputString + "\n\n\nPF: " + result + "\nA:  " + finalAnswer;
 			
 			return finalOutput;
 		}
@@ -177,7 +178,20 @@ public class Converter {
 		return errMessage;
 		
     }	
-
-
+	
+	private String roundOff(double evaluatedValue) {
+		
+		int integerAns = (int)evaluatedValue;
+		double doubleAns = evaluatedValue - integerAns;
+		
+		if(doubleAns == 0.0)
+			return String.valueOf(integerAns);
+		else{
+			String result = String.format("%1$.5f", doubleAns);
+			return String.valueOf(Double.parseDouble(result) + integerAns);
+		}
+		
+	}
+		
 		
 }
