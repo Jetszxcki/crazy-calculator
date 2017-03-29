@@ -41,7 +41,7 @@ public class Calculator extends JFrame implements ActionListener {
 		screen = new JTextArea(5,25);
 		screen.setForeground(Color.WHITE);
 		screen.setBackground(new Color(40,40,40));
-		screen.setFont(new Font("Consolas", Font.PLAIN, fontSize));
+		screen.setFont(new Font("Consolas", Font.PLAIN, 50));
 		screen.setEditable(false);
 		screen.setText("0");
 	
