@@ -25,8 +25,6 @@ public class Calculator extends JFrame implements ActionListener {
 	
 	private String ss = "READ|    PARSED   |   WRITTEN   |     STACK\n";
 	private String string = "0";
-	private int fontSize = 50;
-	private int ctr = 27;
 	
 	public Calculator() {
 		
@@ -153,21 +151,14 @@ public class Calculator extends JFrame implements ActionListener {
 		}
 	}
 	
-	private void addToString(String s) {
-		if((string.length() % ctr) == 0) {
-			ctr++;
-			fontSize--;
-			screen.setFont(new Font("Consolas", Font.PLAIN, fontSize));
-		}
-		screen.append(s);
-		string += s;
-	}
-	
 	private void input(String s) {
 		if(string.equals("0")) {
 			screen.setText(s);
 			string = s;
-		}else addToString(s);
+		}else{
+			screen.append(s);
+			string += s;
+		}
 	}
 	
 	public void actionPerformed(ActionEvent e) {
@@ -203,6 +194,7 @@ public class Calculator extends JFrame implements ActionListener {
 		else if(e.getSource() == operators[4]) {
 			System.out.print(ss);
 			try{
+				resetTextPane();
 				convert = new Converter(string);
 				String result = convert.toPostFix();
 				screen.setText(result);	
@@ -217,7 +209,7 @@ public class Calculator extends JFrame implements ActionListener {
 				input(String.valueOf(x));
 			else if(x < 4 && e.getSource() == operators[x]) {
 				String[] symbols = {"/", "x", "-", "+"};
-				addToString(symbols[x]);
+				input(symbols[x]);
 			}
 		}
 		
