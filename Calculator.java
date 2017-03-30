@@ -54,11 +54,7 @@ public class Calculator extends JFrame implements ActionListener {
 		JPanel numPanel = new JPanel();
 		JPanel right = new JPanel();
 		JPanel[] panels = { operatorPanel, topNumPanel, centerPanel, screenPanel, mainPanel, numPanel, snapshot, right };	
-		
-		operatorPanel.setBorder(myBorder());
-		centerPanel.setBorder(myBorder());
-		screenPanel.setBorder(myBorder());
-		
+				
 		operatorPanel.setPreferredSize(new Dimension(200,100));
 		topNumPanel.setPreferredSize(new Dimension(50,80));
 		snapshot.setPreferredSize(new Dimension(550,200));
@@ -71,6 +67,10 @@ public class Calculator extends JFrame implements ActionListener {
 		snapshot.setLayout(new GridLayout(1,4,5,5));
 		mainPanel.setLayout(new BorderLayout(5,10));
 		numPanel.setLayout(new GridLayout(4,3,7,7));
+		
+		operatorPanel.setBorder(myBorder());
+		centerPanel.setBorder(myBorder());
+		screenPanel.setBorder(myBorder());
 										
 		Color c = Color.BLACK; 		
 		for(int x = 0; x < panels.length; x++)
@@ -96,6 +96,7 @@ public class Calculator extends JFrame implements ActionListener {
 				snapshotScreens[k] = new JTextPane();
 				snapshotScreens[k].setFont(new Font("Consolas", Font.PLAIN, 20));
 				snapshotScreens[k].setBackground(new Color(40,40,40));
+				snapshotScreens[k].addKeyListener(new KeyHandler());
 				snapshotScreens[k].setForeground(Color.WHITE);
 				snapshotScreens[k].setEditable(false);
 				snapshot.add(snapshotScreens[k]);
@@ -136,22 +137,25 @@ public class Calculator extends JFrame implements ActionListener {
 	}	
 	
 	private Border myBorder() {
+		
 		Border line1, line2, compound;
 		line1 = BorderFactory.createLineBorder(new Color(80,80,80), 5, true);
 		line2 = BorderFactory.createLineBorder(Color.BLACK, 10, true);
 		compound = BorderFactory.createCompoundBorder(line1, line2);
 		return compound;
+		
 	}
 	
 	private void resetTextPane() {
+		
 		String[] s = {"READ\n","PARSED\n","WRITTEN\n","STACK\n"};
-		for(int x = 0; x < 4; x++) {
-			snapshotScreens[x].setText(null);
+		for(int x = 0; x < 4; x++)
 			snapshotScreens[x].setText(s[x]);
-		}
+		
 	}
 	
 	private void input(String s) {
+		
 		if(string.equals("0")) {
 			screen.setText(s);
 			string = s;
@@ -159,50 +163,59 @@ public class Calculator extends JFrame implements ActionListener {
 			screen.append(s);
 			string += s;
 		}
+		
+	}
+	
+	public void clearAll() {
+		
+		convert = new Converter();
+		screen.setText("0");
+		resetTextPane();
+		string = "0";
+		
+	}
+	
+	public void clear() {
+		
+		try{			
+			resetTextPane();
+			screen.setText("");
+			StringBuilder sb = new StringBuilder(string);
+			sb.deleteCharAt(string.length()-1);
+			string = sb.toString();
+			screen.setText(string);
+			
+			if(string.length() == 0) {
+				screen.setText("0");
+				string = "0";
+			}
+		}catch(StringIndexOutOfBoundsException s) {}
+		
+	}
+	
+	public void compute() {
+		
+		System.out.print(ss);
+		try{
+			resetTextPane();
+			convert = new Converter(string);
+			String result = convert.toPostFix();
+			screen.setText(result);	
+			System.out.println("\n\n" + result);
+		}catch(NullPointerException np) {
+			screen.setText(string + "\n\nPF:(" + string + ")\nA: " + string);
+		}
+		
 	}
 	
 	public void actionPerformed(ActionEvent e) {
 		
-		if(e.getSource() == otherButtons[0]) 
-			System.exit(0);
-			
-		else if(e.getSource() == otherButtons[1]) {
-			convert = new Converter();
-			screen.setText("0");
-			resetTextPane();
-			string = "0";
-			
-		}else if(e.getSource() == otherButtons[2]) {	
-			try {			
-				resetTextPane();
-				screen.setText("");
-				StringBuilder sb = new StringBuilder(string);
-				sb.deleteCharAt(string.length()-1);
-				string = sb.toString();
-				screen.setText(string);
-				
-				if(string.length() == 0) {
-					screen.setText("0");
-					string = "0";
-				}
-			}catch(StringIndexOutOfBoundsException s) {}
-		}
-		
+		if(e.getSource() == otherButtons[0]) System.exit(0);
+		else if(e.getSource() == otherButtons[1]) clearAll();
+		else if(e.getSource() == otherButtons[2]) clear();
 		else if(e.getSource() == otherButtons[3]) input("(");
 		else if(e.getSource() == otherButtons[4]) input(")");
-		
-		else if(e.getSource() == operators[4]) {
-			System.out.print(ss);
-			try{
-				resetTextPane();
-				convert = new Converter(string);
-				String result = convert.toPostFix();
-				screen.setText(result);	
-				System.out.println("\n\n" + result);
-			}catch(NullPointerException np) {
-				screen.setText(string + "\n\nPF:(" + string + ")\nA: " + string);
-			}
-		}
+		else if(e.getSource() == operators[4]) compute();
 		
 		for(int x = 0; x < 10; x++) {
 			if(e.getSource() == digits[x]) 
@@ -215,14 +228,13 @@ public class Calculator extends JFrame implements ActionListener {
 		
 	}
 	
-	
+	String[] nums = {"0(2).png", "1(2).png", "2(2).png", "3(2).png", "4(2).png", "5(2).png", "6(2).png", "7(2).png", "8(2).png", "9(2).png"};
+	String[] operations = {"divide(2).png", "multiply(2).png", "subtract(2).png", "add(2).png", "equals(2).png"};
+	String[] others = {"off(2).png", "clear(2).png", "backspace(2).png", "openP(2).png", "closeP(2).png"};
+			
 	private class MouseHandler extends MouseAdapter {
 		
-		public void mousePressed(MouseEvent m) {
-			String[] nums = {"0(2).png", "1(2).png", "2(2).png", "3(2).png", "4(2).png", "5(2).png", "6(2).png", "7(2).png", "8(2).png", "9(2).png"};
-			String[] operations = {"divide(2).png", "multiply(2).png", "subtract(2).png", "add(2).png", "equals(2).png"};
-			String[] others = {"off(2).png", "clear(2).png", "backspace(2).png", "openP(2).png", "closeP(2).png"};
-			
+		public void mousePressed(MouseEvent m) {		
 			for(int x = 0; x < digits.length; x++) {
 				if(m.getSource() == digits[x]) 
 					digits[x].setIcon(new ImageIcon("images/" + nums[x]));
@@ -245,6 +257,64 @@ public class Calculator extends JFrame implements ActionListener {
 		}
 		
 	}
+	
+	private class KeyHandler extends KeyAdapter {
+		
+		char[] symbols = {'/', '*', '-', '+'};
+		int[] numKeys = { KeyEvent.VK_0, KeyEvent.VK_1, KeyEvent.VK_2, 
+						  KeyEvent.VK_3, KeyEvent.VK_4, KeyEvent.VK_5, 
+						  KeyEvent.VK_6, KeyEvent.VK_7, KeyEvent.VK_8, KeyEvent.VK_9 };
+		
+		public void keyPressed(KeyEvent k) {
+			
+			for(int x = 0; x < numKeys.length; x++) {
+				if(k.getKeyCode() == numKeys[x])
+					digits[x].setIcon(new ImageIcon("images/" + nums[x]));
+				else if(x < 4 && k.getKeyChar() == symbols[x])
+					operators[x].setIcon(new ImageIcon("images/" + operations[x]));
+			}
+			if(k.getKeyCode() == KeyEvent.VK_BACK_SPACE)
+				otherButtons[2].setIcon(new ImageIcon("images/" + others[2]));
+			else if(k.getKeyCode() == KeyEvent.VK_DELETE)
+				otherButtons[1].setIcon(new ImageIcon("images/" + others[1]));
+			else if(k.getKeyCode() == KeyEvent.VK_ENTER)
+				operators[4].setIcon(new ImageIcon("images/" + operations[4]));
+			else if(k.getKeyCode() == KeyEvent.VK_ESCAPE) 
+				otherButtons[0].setIcon(new ImageIcon("images/" + others[0]));
+			
+		}
+		
+		public void keyReleased(KeyEvent k) {
+			
+			for(int y = 0; y < numKeys.length; y++) {
+				if(k.getKeyCode() == numKeys[y]) {
+					digits[y].setIcon(new ImageIcon(numImgs[y]));
+					input(String.valueOf(y));
+				}else if(y < 4 && k.getKeyChar() == symbols[y]) {
+					operators[y].setIcon(new ImageIcon(operatorImgs[y]));
+					input(String.valueOf(symbols[y]));
+				}
+			}
+			
+			if(k.getKeyChar() == '(') 
+				input("(");
+			else if(k.getKeyChar() == ')') 
+				input(")");
+			else if(k.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+				otherButtons[2].setIcon(new ImageIcon(otherImgs[2]));
+				clear();
+			}else if(k.getKeyCode() == KeyEvent.VK_DELETE) {
+				otherButtons[1].setIcon(new ImageIcon(otherImgs[1]));
+				clearAll();
+			}else if(k.getKeyCode() == KeyEvent.VK_ENTER) {
+				operators[4].setIcon(new ImageIcon(operatorImgs[4]));
+				compute();
+			}else if(k.getKeyCode() == KeyEvent.VK_ESCAPE)
+				System.exit(0);
+			
+		}
+		
+	}	
 	
 	
 }
