@@ -18,11 +18,11 @@ public class Converter {
 		
 	}	
 	
-	public boolean isOperator(String s) {
-		return s.equals("+") || s.equals("-") || s.equals("x") || s.equals("/");
+	public static boolean isOperator(String s) {
+		return s.equals("+") || s.equals("-") || s.equals("*") || s.equals("/");
 	}
 	
-	public boolean isOperand(String s) {
+	public static boolean isOperand(String s) {
 		return !s.equals("(") && !s.equals(")") && !isOperator(s);
 	}
 	  
@@ -31,6 +31,7 @@ public class Converter {
 
 		String temp = "(", infix = "", previousChar = "", previousOperator = "";
 		String space = "           ";
+		double answer = 0.0;
 		
 		for(int x = 0; x < inputString.length(); x++) {
 			String current = String.valueOf(inputString.charAt(x));
@@ -40,22 +41,21 @@ public class Converter {
 					result = errMessage;
 					break;
 				}else if(current.equals("+") || current.equals("-")) {
-					  if(previousOperator != "" && stack.elements != 0)
+					if(previousOperator != "" && stack.elements != 0)
 						result += stack.pop();
 					stack.push(current);
-				}else if(current.equals("/") || current.equals("x")) {
-					if(previousOperator.equals("/") || previousOperator.equals("x"))
+				}else if(current.equals("/") || current.equals("*")) {
+					if(previousOperator.equals("/") || previousOperator.equals("*"))
 						result += stack.pop();
 					stack.push(current);
 				}
 				previousOperator = current;
 				
 			}else if(current.equals("(")) {
-				if(x == inputString.length()-1) {
+				if(x == inputString.length()-1 || previousChar.equals("") || isOperand(previousChar) || previousChar.equals(")")) {
 					result = errMessage;
 					break;
-				}else if(x == 0 && previousChar.equals("") && isOperand(previousChar) && previousChar.equals(")"))
-					stack.push("x");
+				}
 				
 				left++;
 				previousOperator = "";
@@ -82,26 +82,25 @@ public class Converter {
 				}else if(previousChar.equals(")")) {
 					result = errMessage;
 					break;
-				}
-				if(x != inputString.length()-1) {
-					String next = String.valueOf(inputString.charAt(x+1));
-					temp += current;
-					if(!isOperand(next)) {
-						result += temp + ")";
-						temp = "(";
-					}
 				}else{
-				   temp += current + ")";
-				   result += temp;
+					String next;
+					try{
+						next = String.valueOf(inputString.charAt(x+1));
+					}catch(Exception ex){ next = null; }
+					
+					temp += current;
+					if(next == null || !isOperand(next)) {
+						if(temp.length() > 2) {
+							result += temp + ")";
+							temp = "(";
+						}else{
+							result += current;
+							temp = "(";
+						}
+					}
 				}
 			}	
-     
-			if(x == inputString.length()-1) {
-				for(int k = 0; k <= stack.elements; k++)
-					result += stack.pop();
-				stack.elements = 0;
-			}
-			
+     		
 			infix += current;
 			
 			try {				
@@ -118,51 +117,68 @@ public class Converter {
 	
 			previousChar = current;
         }
-		       
-//+++++++++++++++++++++  EVALUATION  +++++++++++++++++++++++++++++++++++++
 		
-		int addedElements = 0;
-		double answer = 0.0;
-		double temp2 = 0.0;
+		if(!result.equals(errMessage) && !result.equals(mathErr)) {
+			
+			Calculator.snapshotScreens[0].setText(Calculator.snapshotScreens[0].getText() + "END");
+			if(stack.elements != 0) {		
+				for(int k = 0; k <= stack.elements; k++) {
+					result += stack.pop();
+					Calculator.snapshotScreens[1].setText(Calculator.snapshotScreens[1].getText() + inputString + "\n");
+					Calculator.snapshotScreens[2].setText(Calculator.snapshotScreens[2].getText() + result + "\n");
+					stack.display();
+				}
+				stack.elements = 0;	
+			}
 		
-		for(int x = 0; x < result.length(); x++) {
+				   
+	// +++++++++++++++++++++++++  EVALUATION  +++++++++++++++++++++++++++++++++++++
 			
-			String current = String.valueOf(result.charAt(x));
+			int addedElements = 0;
+			double temp2 = 0.0;
 			
-			if(isOperand(current)) {
-				stack.push(current);
-				addedElements++;
+			for(int x = 0; x < result.length(); x++) {
 				
-			}else if(current.equals(")")) {
-				int exponent = 0, limit = 0;
-				while(addedElements > limit++) {
-					temp2 += Math.pow(10,exponent)*(Double.parseDouble(stack.pop()));
-					exponent++;
-				}
-				stack.push(String.valueOf(temp2));
-				addedElements = 0;
-				temp2 = 0.0;
+				String current = String.valueOf(result.charAt(x));
 				
-			}else if(isOperator(current)) {
-				double num1 = Double.parseDouble(stack.pop());
-				double num2 = Double.parseDouble(stack.pop());
+				if(isOperand(current)) {
+					stack.push(current);
+					addedElements++;
+					
+				}else if(current.equals("(") && addedElements != 0) {
+					addedElements--;
+					
+				}else if(current.equals(")")) {
+					int exponent = 0, limit = 0;
+					while(addedElements > limit++) {
+						temp2 += Math.pow(10,exponent)*(Double.parseDouble(stack.pop()));
+						exponent++;
+					}
+					stack.push(String.valueOf(temp2));
+					addedElements = 0;
+					temp2 = 0.0;
+					
+				}else if(isOperator(current)) {
+					double num1 = Double.parseDouble(stack.pop());
+					double num2 = Double.parseDouble(stack.pop());
+					
+					if(current.equals("+")) 
+						answer = num1 + num2;
+					else if(current.equals("-")) 
+						answer = num2 - num1;
+					else if(current.equals("*")) 
+						answer = num1 * num2;
+					else if(current.equals("/")) {
+						if(num1 == 0) {
+							result = mathErr;
+							break;
+						}else answer = num2 / num1;
+					}
+					stack.push(String.valueOf(answer));
+				} 
 				
-				if(current.equals("+")) 
-					answer = num1 + num2;
-				else if(current.equals("-")) 
-					answer = num2 - num1;
-				else if(current.equals("x")) 
-					answer = num1 * num2;
-				else if(current.equals("/")) {
-					if(num1 == 0) {
-						result = mathErr;
-						break;
-					}else answer = num2 / num1;
-				}
-				stack.push(String.valueOf(answer));
-			} 
-			
-		}		
+			}	
+		}
 		
 		String finalAnswer = roundOff(answer);
 		
@@ -177,7 +193,7 @@ public class Converter {
 		
 		return errMessage;
 		
-    }	
+    }
 	
 	private String roundOff(double evaluatedValue) {
 		
@@ -192,6 +208,5 @@ public class Converter {
 		}
 		
 	}
-		
 		
 }
