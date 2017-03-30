@@ -10,8 +10,8 @@ import java.awt.*;
 
 public class Calculator extends JFrame implements ActionListener {
 	
-	private String[] operatorImgs = {"images/divide.png", "images/multiply.png", "images/subtract.png", "images/add.png", "images/equals.png"};
 	private String[] otherImgs = {"images/off.png", "images/clear.png", "images/backspace.png", "images/openParenthesis.png", "images/closeParenthesis.png"};
+	private String[] operatorImgs = {"images/divide.png", "images/multiply.png", "images/subtract.png", "images/add.png", "images/equals.png"};
 	private String[] numImgs = {"images/0.png", "images/1.png", "images/2.png", "images/3.png", "images/4.png", "images/5.png", 
 								"images/6.png", "images/7.png", "images/8.png", "images/9.png"};
 	
@@ -41,7 +41,7 @@ public class Calculator extends JFrame implements ActionListener {
 		screen = new JTextArea(5,25);
 		screen.setForeground(Color.WHITE);
 		screen.setBackground(new Color(40,40,40));
-		screen.setFont(new Font("Consolas", Font.PLAIN, 50));
+		screen.setFont(new Font("Consolas", Font.PLAIN, 40));
 		screen.setEditable(false);
 		screen.setText("0");
 	
@@ -52,13 +52,12 @@ public class Calculator extends JFrame implements ActionListener {
 		JPanel mainPanel = new JPanel();
 		JPanel snapshot = new JPanel();
 		JPanel numPanel = new JPanel();
-		JPanel right = new JPanel();
-		JPanel[] panels = { operatorPanel, topNumPanel, centerPanel, screenPanel, mainPanel, numPanel, snapshot, right };	
+		JPanel[] panels = { operatorPanel, topNumPanel, centerPanel, screenPanel, mainPanel, numPanel, snapshot };	
 				
 		operatorPanel.setPreferredSize(new Dimension(200,100));
-		topNumPanel.setPreferredSize(new Dimension(50,80));
+		screenPanel.setPreferredSize(new Dimension(100,350));
+		topNumPanel.setPreferredSize(new Dimension(50,70));
 		snapshot.setPreferredSize(new Dimension(550,200));
-		right.setPreferredSize(new Dimension(50,200));
 		
 		operatorPanel.setLayout(new GridLayout(5,1,7,7));
 		topNumPanel.setLayout(new GridLayout(1,3,7,7));
@@ -156,7 +155,7 @@ public class Calculator extends JFrame implements ActionListener {
 	
 	private void input(String s) {
 		
-		if(string.equals("0")) {
+		if(string.equals("0") && !Converter.isOperator(s)) {
 			screen.setText(s);
 			string = s;
 		}else{
@@ -196,15 +195,11 @@ public class Calculator extends JFrame implements ActionListener {
 	public void compute() {
 		
 		System.out.print(ss);
-		try{
-			resetTextPane();
-			convert = new Converter(string);
-			String result = convert.toPostFix();
-			screen.setText(result);	
-			System.out.println("\n\n" + result);
-		}catch(NullPointerException np) {
-			screen.setText(string + "\n\nPF:(" + string + ")\nA: " + string);
-		}
+		resetTextPane();
+		convert = new Converter(string);
+		String result = convert.toPostFix();
+		screen.setText(result);	
+		System.out.println("\n\n" + result);
 		
 	}
 	
@@ -221,7 +216,7 @@ public class Calculator extends JFrame implements ActionListener {
 			if(e.getSource() == digits[x]) 
 				input(String.valueOf(x));
 			else if(x < 4 && e.getSource() == operators[x]) {
-				String[] symbols = {"/", "x", "-", "+"};
+				String[] symbols = {"/", "*", "-", "+"};
 				input(symbols[x]);
 			}
 		}
@@ -273,7 +268,12 @@ public class Calculator extends JFrame implements ActionListener {
 				else if(x < 4 && k.getKeyChar() == symbols[x])
 					operators[x].setIcon(new ImageIcon("images/" + operations[x]));
 			}
-			if(k.getKeyCode() == KeyEvent.VK_BACK_SPACE)
+			
+			if(k.getKeyChar() == '(') 
+				otherButtons[3].setIcon(new ImageIcon("images/" + others[3]));
+			else if(k.getKeyChar() == ')')
+				otherButtons[4].setIcon(new ImageIcon("images/" + others[4]));
+			else if(k.getKeyCode() == KeyEvent.VK_BACK_SPACE)
 				otherButtons[2].setIcon(new ImageIcon("images/" + others[2]));
 			else if(k.getKeyCode() == KeyEvent.VK_DELETE)
 				otherButtons[1].setIcon(new ImageIcon("images/" + others[1]));
@@ -296,11 +296,13 @@ public class Calculator extends JFrame implements ActionListener {
 				}
 			}
 			
-			if(k.getKeyChar() == '(') 
+			if(k.getKeyChar() == '(') {
+				otherButtons[3].setIcon(new ImageIcon(otherImgs[3]));
 				input("(");
-			else if(k.getKeyChar() == ')') 
-				input(")");
-			else if(k.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+			}else if(k.getKeyChar() == ')') {
+				otherButtons[4].setIcon(new ImageIcon(otherImgs[4]));
+				input(")");	
+			}else if(k.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
 				otherButtons[2].setIcon(new ImageIcon(otherImgs[2]));
 				clear();
 			}else if(k.getKeyCode() == KeyEvent.VK_DELETE) {
