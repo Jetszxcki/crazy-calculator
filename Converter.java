@@ -23,7 +23,7 @@ public class Converter {
 	}
 	
 	public static boolean isOperand(String s) {
-		return !s.equals("(") && !s.equals(")") && !isOperator(s);
+		return !s.equals("(") && !s.equals(")") && !isOperator(s) && !s.equals("");
 	}
 	  
 
@@ -52,7 +52,7 @@ public class Converter {
 				previousOperator = current;
 				
 			}else if(current.equals("(")) {
-				if(x == inputString.length()-1 || previousChar.equals("") || isOperand(previousChar) || previousChar.equals(")")) {
+				if(x == inputString.length()-1 || isOperand(previousChar) || previousChar.equals(")")) {
 					result = errMessage;
 					break;
 				}
@@ -74,6 +74,7 @@ public class Converter {
 						else break;
 					}
 				}
+				previousOperator = "";
 				
 			}else{
 				if(current.equals("0") && previousChar.equals("/")) {
@@ -156,7 +157,7 @@ public class Converter {
 					}
 					stack.push(String.valueOf(temp2));
 					addedElements = 0;
-					temp2 = 0.0;
+					temp2 = 0.0;	
 					
 				}else if(isOperator(current)) {
 					double num1 = Double.parseDouble(stack.pop());
@@ -175,8 +176,8 @@ public class Converter {
 						}else answer = num2 / num1;
 					}
 					stack.push(String.valueOf(answer));
+					addedElements = 0;
 				} 
-				
 			}	
 		}
 		
