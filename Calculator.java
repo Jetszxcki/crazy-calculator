@@ -9,18 +9,27 @@ import java.awt.*;
 @SuppressWarnings("serial")
 
 public class Calculator extends JFrame implements ActionListener {
+
 	
+	public static Color[] colors = {new Color(238,0,0), new Color(255,69,0), new Color(255,97,3), new Color(255,128,0), new Color(238,201,0), new Color(255,255,0),
+									new Color(127,255,0), new Color(0,255,0), new Color(0,238,118), new Color(0,238,238), Color.DARK_GRAY};
 	private String[] otherImgs = {"images/off.png", "images/clear.png", "images/backspace.png", "images/openParenthesis.png", "images/closeParenthesis.png"};
 	private String[] operatorImgs = {"images/divide.png", "images/multiply.png", "images/subtract.png", "images/add.png", "images/equals.png"};
 	private String[] numImgs = {"images/0.png", "images/1.png", "images/2.png", "images/3.png", "images/4.png", "images/5.png", 
 								"images/6.png", "images/7.png", "images/8.png", "images/9.png"};
 	
-	private JLabel heading = new JLabel("CRAZY CALCULATOR", SwingConstants.CENTER);
 	public static JTextPane[] snapshotScreens = new JTextPane[4];
+	public static JLabel[][] structureItems = new JLabel[5][10];
+	public static JPanel[][] structures = new JPanel[5][10];
 	private JButton[] otherButtons = new JButton[5];
 	private JButton[] operators = new JButton[5];
 	private JButton[] digits = new JButton[10];
+	
 	public static JTextArea screen;
+	private JPanel animationPanel;
+	private JPanel structurePanel;
+	private JPanel snapshotPanel;
+	private JPanel labelsPanel;
 	private Converter convert;
 	
 	private String ss = "READ|    PARSED   |   WRITTEN   |     STACK\n";
@@ -34,7 +43,8 @@ public class Calculator extends JFrame implements ActionListener {
 	}
 		
 	private void setCalculatorComponents() {
-			
+		
+		JLabel heading = new JLabel("CRAZY CALCULATOR", SwingConstants.CENTER);
 		heading.setFont(new Font("Eras Bold ITC", Font.BOLD, 20));
 		heading.setForeground(Color.WHITE);
 		
@@ -44,26 +54,35 @@ public class Calculator extends JFrame implements ActionListener {
 		screen.setFont(new Font("Consolas", Font.PLAIN, 40));
 		screen.setEditable(false);
 		screen.setText("0");
-	
+		
 		JPanel operatorPanel = new JPanel();
 		JPanel topNumPanel = new JPanel();
 		JPanel screenPanel = new JPanel();
 		JPanel centerPanel = new JPanel();
 		JPanel mainPanel = new JPanel();
-		JPanel snapshot = new JPanel();
+		JPanel leftPanel = new JPanel();
 		JPanel numPanel = new JPanel();
-		JPanel[] panels = { operatorPanel, topNumPanel, centerPanel, screenPanel, mainPanel, numPanel, snapshot };	
+		animationPanel = new JPanel();
+		structurePanel = new JPanel();
+		snapshotPanel = new JPanel();
+		labelsPanel = new JPanel();
+		
+		JPanel[] panels = { operatorPanel, topNumPanel, centerPanel, screenPanel, mainPanel, numPanel, leftPanel, snapshotPanel, animationPanel, labelsPanel, structurePanel };	
 				
 		operatorPanel.setPreferredSize(new Dimension(200,100));
 		screenPanel.setPreferredSize(new Dimension(100,350));
 		topNumPanel.setPreferredSize(new Dimension(50,70));
-		snapshot.setPreferredSize(new Dimension(550,200));
+		leftPanel.setPreferredSize(new Dimension(550,200));
 		
+		structurePanel.setLayout(new GridLayout(1,4,3,3));
 		operatorPanel.setLayout(new GridLayout(5,1,7,7));
+		snapshotPanel.setLayout(new GridLayout(1,4,3,3));
+		animationPanel.setLayout(new BorderLayout(0,0));
 		topNumPanel.setLayout(new GridLayout(1,3,7,7));
+		labelsPanel.setLayout(new GridLayout(1,4,3,3));
 		centerPanel.setLayout(new BorderLayout(5,5));
 		screenPanel.setLayout(new BorderLayout(5,5));
-		snapshot.setLayout(new GridLayout(1,4,5,5));
+		leftPanel.setLayout(new GridLayout(2,1,5,5));
 		mainPanel.setLayout(new BorderLayout(5,10));
 		numPanel.setLayout(new GridLayout(4,3,7,7));
 		
@@ -93,12 +112,12 @@ public class Calculator extends JFrame implements ActionListener {
 			
 			if(k < 4) {
 				snapshotScreens[k] = new JTextPane();
-				snapshotScreens[k].setFont(new Font("Consolas", Font.PLAIN, 20));
+				snapshotScreens[k].setFont(new Font("Consolas", Font.PLAIN, 15));
 				snapshotScreens[k].setBackground(new Color(40,40,40));
 				snapshotScreens[k].addKeyListener(new KeyHandler());
 				snapshotScreens[k].setForeground(Color.WHITE);
 				snapshotScreens[k].setEditable(false);
-				snapshot.add(snapshotScreens[k]);
+				snapshotPanel.add(snapshotScreens[k]);
 				
 				StyledDocument doc = snapshotScreens[k].getStyledDocument();
 				SimpleAttributeSet center = new SimpleAttributeSet();
@@ -126,14 +145,58 @@ public class Calculator extends JFrame implements ActionListener {
 		centerPanel.add(numPanel, BorderLayout.CENTER);
 		screenPanel.add(screen, BorderLayout.CENTER);
 		screenPanel.add(heading, BorderLayout.NORTH);
-
+				
+		JScrollPane scroll;
+		for(int ctr = 0; ctr < 4; ctr++) {
+			scroll = new JScrollPane(snapshotScreens[ctr]);
+			snapshotPanel.add(scroll);
+		}
+		
+		setAnimationPanel();
+		leftPanel.add(snapshotPanel);
+		leftPanel.add(animationPanel);
 		mainPanel.add(centerPanel, BorderLayout.CENTER);
 		mainPanel.add(screenPanel, BorderLayout.NORTH);
 		mainPanel.add(operatorPanel, BorderLayout.EAST);
-		add(snapshot);
+		add(leftPanel);
 		add(mainPanel);
 		
 	}	
+	
+	private void setAnimationPanel() {
+		
+		JLabel[] labels = new JLabel[5];
+		JPanel[] structureHolder = new JPanel[5];
+		Font font = new Font("Consolas", Font.PLAIN, 15);
+		String[] strLabels = {"STACK", "QUEUE 1", "QUEUE 2", "PSEUDOARRAY", "LINKED LIST"};
+		
+		for(int x = 0; x < 5; x++) {
+			structureHolder[x] = new JPanel();
+			structureHolder[x].setBackground(Color.BLACK);
+			structureHolder[x].setLayout(new GridLayout(10,1));
+			structurePanel.add(structureHolder[x]);	
+			for(int y = 9; y >= 0; y--) {
+				structures[x][y] = new JPanel();
+				structureItems[x][y] = new JLabel(" ", SwingConstants.CENTER);
+				structureItems[x][y].setPreferredSize(new Dimension(130,28));
+				structureItems[x][y].setForeground(Color.WHITE);
+				structureItems[x][y].setBackground(Color.BLACK);
+				structureItems[x][y].setOpaque(true);
+				structureItems[x][y].setFont(font);
+				structures[x][y].setBackground(Color.DARK_GRAY);
+				structures[x][y].add(structureItems[x][y]);
+				//structures[x][y].setVisible(false);
+				structureHolder[x].add(structures[x][y]);
+			}
+			labels[x] = new JLabel(strLabels[x], SwingConstants.CENTER);
+			labels[x].setForeground(Color.WHITE);
+			labelsPanel.add(labels[x]);
+			labels[x].setFont(font);
+		}
+		animationPanel.add(structurePanel, BorderLayout.CENTER);
+		animationPanel.add(labelsPanel, BorderLayout.SOUTH);
+		
+	}
 	
 	private Border myBorder() {
 		
@@ -197,9 +260,7 @@ public class Calculator extends JFrame implements ActionListener {
 		System.out.print(ss);
 		resetTextPane();
 		convert = new Converter(string);
-		String result = convert.toPostFix();
-		screen.setText(result);	
-		System.out.println("\n\n" + result);
+		convert.start();
 		
 	}
 	
@@ -261,7 +322,6 @@ public class Calculator extends JFrame implements ActionListener {
 						  KeyEvent.VK_6, KeyEvent.VK_7, KeyEvent.VK_8, KeyEvent.VK_9 };
 		
 		public void keyPressed(KeyEvent k) {
-			
 			for(int x = 0; x < numKeys.length; x++) {
 				if(k.getKeyCode() == numKeys[x])
 					digits[x].setIcon(new ImageIcon("images/" + nums[x]));
@@ -281,11 +341,9 @@ public class Calculator extends JFrame implements ActionListener {
 				operators[4].setIcon(new ImageIcon("images/" + operations[4]));
 			else if(k.getKeyCode() == KeyEvent.VK_ESCAPE) 
 				otherButtons[0].setIcon(new ImageIcon("images/" + others[0]));
-			
 		}
 		
 		public void keyReleased(KeyEvent k) {
-			
 			for(int y = 0; y < numKeys.length; y++) {
 				if(k.getKeyCode() == numKeys[y]) {
 					digits[y].setIcon(new ImageIcon(numImgs[y]));
@@ -313,7 +371,6 @@ public class Calculator extends JFrame implements ActionListener {
 				compute();
 			}else if(k.getKeyCode() == KeyEvent.VK_ESCAPE)
 				System.exit(0);
-			
 		}
 		
 	}	
