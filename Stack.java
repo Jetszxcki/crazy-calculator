@@ -8,8 +8,8 @@ public class Stack {
 	
 	public Stack() {
 		
-		q1 = new Queue();
-		q2 = new Queue();
+		q1 = new Queue(1);
+		q2 = new Queue(2);
 		
 	}
 	
@@ -18,8 +18,11 @@ public class Stack {
 		if(q1q2)
 			q1.enqueue(item);
 		else q2.enqueue(item);
+		
+		Calculator.structures[0][elements].setBackground(Calculator.colors[elements]);
+		Calculator.structureItems[0][elements].setText(item);
 		elements++;
-				
+		
 	}
 	
 	public String pop() {
@@ -39,16 +42,20 @@ public class Stack {
 			output = q2.dequeue();
 		}
 		elements--;
+		Calculator.structures[0][elements].setBackground(Calculator.colors[10]);
+		Calculator.structureItems[0][elements].setText(" ");
 		return output;
 		
 	}
 	
 	public void display() {
+		
 		if(q1q2){
 			q1.display();
 		}else{
 			q2.display();
 		}
+		
 	}
 	
 }
