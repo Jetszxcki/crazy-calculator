@@ -4,6 +4,7 @@ public class PseudoArray {
 	private Link first;
 	private Link last;
 	private Link curr;
+	private int count = 0;
 	
 	public PseudoArray(int size) {
 		
@@ -12,15 +13,15 @@ public class PseudoArray {
 		
 		for(int i = 0; i < size; i++) {
 			Link newLink = new Link();
-			
 			if(isEmpty()) 
 				first = newLink;
 			else last.next = newLink;
 			
 			last = newLink;
+			Calculator.structures[3][i].setBackground(Calculator.colors[i]);
 		}
 		curr = first;
-	
+		
 	}
 	
 	public boolean isEmpty() {
@@ -28,8 +29,13 @@ public class PseudoArray {
 	}
 	
 	public void add(String item) {
+		
+		Calculator.structureItems[3][count].setText(item);
+		Calculator.structureItems[4][count].setText(item);
 		curr.setItem(item);
 		curr = curr.next;
+		count++;
+		
 	}
 	
 	public String delete() {
@@ -47,6 +53,9 @@ public class PseudoArray {
 		else last.next = newLink;
 		
 		last = newLink;
+		Calculator.structureItems[3][count].setText(" ");
+		Calculator.structureItems[4][count].setText(" ");
+		count--;
 		return temp;
 		
 	}
