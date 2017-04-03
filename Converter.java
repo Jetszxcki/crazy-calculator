@@ -28,10 +28,9 @@ public class Converter extends Thread {
 	}
 
 	public void run() {
-		
+	
 		try{
-			String temp = "(", parsed = "", previousChar = "", previousOperator = "";
-			String space = "           ";
+			String temp = "(", parsed = "", previousChar = "", previousOperator = "",  previousOperator2 = "";
 			double answer = 0.0;
 			
 			for(int x = 0; x < inputString.length(); x++) {
@@ -44,14 +43,15 @@ public class Converter extends Thread {
 					}else if(current.equals("+") || current.equals("-")) {
 						if(previousOperator != "" && stack.elements != 0)
 							postfix += stack.pop();
-						Thread.sleep(2000);
+						Thread.sleep(500);
 						stack.push(current);
 					}else if(current.equals("/") || current.equals("*")) {
 						if(previousOperator.equals("/") || previousOperator.equals("*"))
 							postfix += stack.pop();
-						Thread.sleep(2000);
+						Thread.sleep(500);
 						stack.push(current);
 					}
+					previousOperator2 = previousOperator;
 					previousOperator = current;
 					
 				}else if(current.equals("(")) {
@@ -73,7 +73,7 @@ public class Converter extends Thread {
 					}else{
 						while(true) {
 							String popped = stack.pop();
-							Thread.sleep(2000);
+							Thread.sleep(500);
 							if(!popped.equals("("))
 								postfix += popped;
 							else break;
@@ -110,17 +110,17 @@ public class Converter extends Thread {
 				parsed += current;
 				displaySnapshot(current, parsed, postfix, "    ");
 				previousChar = current;
-				Thread.sleep(2000);
-			}		
+				Thread.sleep(500);
+			}
 			
 			if(left != right) postfix = errMessage;			
 			if(!postfix.equals(errMessage) && !postfix.equals(mathErr)) {
-				displaySnapshot("END", parsed, postfix, space);
+				displaySnapshot("END", parsed, postfix, "    ");
 				if(stack.elements != 0) {		
 					for(int k = 0; k <= stack.elements; k++) {
 						postfix += stack.pop();
-						displaySnapshot("", parsed, postfix, space);
-						Thread.sleep(2000);
+						displaySnapshot("", parsed, postfix, "    ");
+						Thread.sleep(500);
 					}
 					stack.elements = 0;	
 				}
@@ -129,32 +129,40 @@ public class Converter extends Thread {
 	// +++++++++++++++++++++++++++++++++++++  EVALUATION  ++++++++++++++++++++++++++++++++++++++++++++++
 			
 				int addedElements = 0;
-				double temp2 = 0.0;
+				String number = "";
 				
 				for(int x = 0; x < postfix.length(); x++) {
 					String current = String.valueOf(postfix.charAt(x));
 					
 					if(isOperand(current)) {
-						stack.push(current);
-						addedElements++;
-						
-					}else if(current.equals("(") && addedElements != 0) {
+						String next = String.valueOf(postfix.charAt(x+1));
+						if(x != postfix.length()-1 && isOperand(next) || next.equals(")"))
+							number += current;
+						else stack.push(current);
+						//addedElements++;
+					}/*else if(current.equals("(") && addedElements != 0) {
 						addedElements--;
-						
-					}else if(current.equals(")")) {
+					}*/
+					else if(current.equals(")")) {
+						stack.push(number);
+						number = "";
+						/*
 						int exponent = 0, limit = 0;
 						while(addedElements > limit++) {
 							temp2 += Math.pow(10,exponent)*(Double.parseDouble(stack.pop()));
+							Thread.sleep(500);
 							exponent++;
 						}
 						
 						stack.push(String.valueOf(temp2));	
 						addedElements = 0;
 						temp2 = 0.0;	
-						
+						*/
 					}else if(isOperator(current)) {
 						double num1 = Double.parseDouble(stack.pop());
+						Thread.sleep(500);
 						double num2 = Double.parseDouble(stack.pop());
+						Thread.sleep(500);
 						
 						if(current.equals("+")) 
 							answer = num1 + num2;
@@ -173,8 +181,9 @@ public class Converter extends Thread {
 					} 
 					parsed += current;
 					displaySnapshot(current, parsed, String.valueOf(answer), "    ");
-					Thread.sleep(2000);
+					Thread.sleep(500);
 				}	
+				displaySnapshot("END", parsed, postfix, "    ");
 				finalAnswer = roundOff(Double.parseDouble(stack.pop()));
 			}
 		}catch(Exception e){ e.printStackTrace(); }
@@ -187,6 +196,7 @@ public class Converter extends Thread {
 		
 		Calculator.screen.setText(output);	
 		System.out.println("\n\n" + output);
+		Calculator.enableButtons(true);
 		
     }
 	
