@@ -1,6 +1,4 @@
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.Border;
-import javax.swing.BorderFactory;
 import javax.swing.text.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -21,9 +19,9 @@ public class Calculator extends JFrame implements ActionListener {
 	public static JTextPane[] snapshotScreens = new JTextPane[4];
 	public static JLabel[][] structureItems = new JLabel[5][10];
 	public static JPanel[][] structures = new JPanel[5][10];
-	private JButton[] otherButtons = new JButton[5];
-	private JButton[] operators = new JButton[5];
-	private JButton[] digits = new JButton[10];
+	private static JButton[] otherButtons = new JButton[5];
+	private static JButton[] operators = new JButton[5];
+	private static JButton[] digits = new JButton[10];
 	
 	public static JTextArea screen;
 	private JPanel animationPanel;
@@ -86,6 +84,7 @@ public class Calculator extends JFrame implements ActionListener {
 		mainPanel.setLayout(new BorderLayout(5,10));
 		numPanel.setLayout(new GridLayout(4,3,7,7));
 		
+		snapshotPanel.setBorder(myBorder());
 		operatorPanel.setBorder(myBorder());
 		centerPanel.setBorder(myBorder());
 		screenPanel.setBorder(myBorder());
@@ -175,6 +174,7 @@ public class Calculator extends JFrame implements ActionListener {
 			structureHolder[x].setBackground(Color.BLACK);
 			structureHolder[x].setLayout(new GridLayout(10,1));
 			structurePanel.add(structureHolder[x]);	
+			
 			for(int y = 9; y >= 0; y--) {
 				structures[x][y] = new JPanel();
 				structureItems[x][y] = new JLabel(" ", SwingConstants.CENTER);
@@ -185,9 +185,9 @@ public class Calculator extends JFrame implements ActionListener {
 				structureItems[x][y].setFont(font);
 				structures[x][y].setBackground(Color.DARK_GRAY);
 				structures[x][y].add(structureItems[x][y]);
-				//structures[x][y].setVisible(false);
 				structureHolder[x].add(structures[x][y]);
 			}
+			
 			labels[x] = new JLabel(strLabels[x], SwingConstants.CENTER);
 			labels[x].setForeground(Color.WHITE);
 			labelsPanel.add(labels[x]);
@@ -213,6 +213,18 @@ public class Calculator extends JFrame implements ActionListener {
 		String[] s = {"READ\n","PARSED\n","WRITTEN\n","STACK\n"};
 		for(int x = 0; x < 4; x++)
 			snapshotScreens[x].setText(s[x]);
+		
+	}
+	
+	public static void enableButtons(boolean bool) {
+		
+		for(int x = 0; x < 10; x++) {
+			digits[x].setEnabled(bool);
+			if(x < 5) {
+				otherButtons[x].setEnabled(bool);
+				operators[x].setEnabled(bool);
+			}
+		}
 		
 	}
 	
@@ -251,7 +263,7 @@ public class Calculator extends JFrame implements ActionListener {
 				screen.setText("0");
 				string = "0";
 			}
-		}catch(StringIndexOutOfBoundsException s) {}
+		}catch(StringIndexOutOfBoundsException s) { s.printStackTrace(); }
 		
 	}
 	
@@ -261,6 +273,7 @@ public class Calculator extends JFrame implements ActionListener {
 		resetTextPane();
 		convert = new Converter(string);
 		convert.start();
+		enableButtons(false);
 		
 	}
 	
