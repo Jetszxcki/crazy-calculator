@@ -130,23 +130,27 @@ public class Converter extends Thread {
 			
 				int addedElements = 0;
 				String number = "";
+				double temp2 = 0.0;
 				
 				for(int x = 0; x < postfix.length(); x++) {
 					String current = String.valueOf(postfix.charAt(x));
 					
 					if(isOperand(current)) {
+						/*
 						String next = String.valueOf(postfix.charAt(x+1));
 						if(x != postfix.length()-1 && isOperand(next) || next.equals(")"))
 							number += current;
-						else stack.push(current);
-						//addedElements++;
-					}/*else if(current.equals("(") && addedElements != 0) {
+						else */
+						stack.push(current);
+						addedElements++;
+					}else if(current.equals("(") && addedElements != 0) {
 						addedElements--;
-					}*/
-					else if(current.equals(")")) {
+						
+					}else if(current.equals(")")) {
+						/*
 						stack.push(number);
 						number = "";
-						/*
+						*/
 						int exponent = 0, limit = 0;
 						while(addedElements > limit++) {
 							temp2 += Math.pow(10,exponent)*(Double.parseDouble(stack.pop()));
@@ -157,7 +161,7 @@ public class Converter extends Thread {
 						stack.push(String.valueOf(temp2));	
 						addedElements = 0;
 						temp2 = 0.0;	
-						*/
+						
 					}else if(isOperator(current)) {
 						double num1 = Double.parseDouble(stack.pop());
 						Thread.sleep(500);
