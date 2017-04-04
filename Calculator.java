@@ -31,6 +31,7 @@ public class Calculator extends JFrame implements ActionListener {
 	private Converter convert;
 	
 	private String ss = "READ|    PARSED   |   WRITTEN   |     STACK\n";
+	public static boolean isRunning;	
 	private String string = "0";
 	
 	public Calculator() {
@@ -274,6 +275,8 @@ public class Calculator extends JFrame implements ActionListener {
 		convert = new Converter(string);
 		convert.start();
 		enableButtons(false);
+		requestFocusInWindow();
+		isRunning = true;
 		
 	}
 	
@@ -323,6 +326,8 @@ public class Calculator extends JFrame implements ActionListener {
 				else if(y < 5 && m.getSource() == otherButtons[y])
 					otherButtons[y].setIcon(new ImageIcon(otherImgs[y]));
 			}
+			if(!isRunning)
+				snapshotScreens[0].requestFocusInWindow();
 		}
 		
 	}
@@ -361,9 +366,11 @@ public class Calculator extends JFrame implements ActionListener {
 				if(k.getKeyCode() == numKeys[y]) {
 					digits[y].setIcon(new ImageIcon(numImgs[y]));
 					input(String.valueOf(y));
+					//return;
 				}else if(y < 4 && k.getKeyChar() == symbols[y]) {
 					operators[y].setIcon(new ImageIcon(operatorImgs[y]));
 					input(String.valueOf(symbols[y]));
+					//return;
 				}
 			}
 			
