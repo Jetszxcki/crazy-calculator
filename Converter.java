@@ -164,7 +164,9 @@ public class Converter extends Thread {
 					else{
 						if(isOperator(output[j])) {
 							second = Double.parseDouble(stack.pop());
+							Thread.sleep(500);
 							first = Double.parseDouble(stack.pop());
+							Thread.sleep(500);
 							
 							if(output[j].equals("+")) 
 								out = first + second;
@@ -182,9 +184,13 @@ public class Converter extends Thread {
 								}
 							}
 							stack.push(Double.toString(out));
+							Thread.sleep(500);
 						}else stack.push(output[j]);
 					}
-					parsed += output[j];
+					
+					if(output[j].length() == 1)
+						parsed += output[j];
+					else parsed += "(" + output[j] + ")";
 					displaySnapshot(output[j], parsed, String.valueOf(out), "    ");
 					Thread.sleep(500);
 				}				
