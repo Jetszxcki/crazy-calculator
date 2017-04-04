@@ -49,8 +49,8 @@ public class Queue {
 					Thread.sleep(500);
 					ctr++;
 				}
-				Calculator.structureItems[num][rear].setText(" ");	
 				Calculator.structures[num][rear].setBackground(Calculator.colors[10]);
+				Calculator.structureItems[num][rear].setText(" ");	
 			}
 			Thread.sleep(500);
 			rear--;
