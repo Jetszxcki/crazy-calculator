@@ -6,6 +6,7 @@ public class Converter extends Thread {
 	private String finalAnswer = "";
 	private String postfix = "";
 	private String inputString;
+	private String[] output;
 	private int right = 0;
 	private int left = 0; 
 	private Stack stack;
@@ -128,65 +129,65 @@ public class Converter extends Thread {
 				   
 	// +++++++++++++++++++++++++++++++++++++  EVALUATION  ++++++++++++++++++++++++++++++++++++++++++++++
 			
-				int addedElements = 0;
-				String number = "";
-				double temp2 = 0.0;
+			
+				int stCtr = 0;
+				double out = 0.0;
+				double first, second;
+				boolean isParenthesis = false;
+				output = new String[postfix.length()];
 				
-				for(int x = 0; x < postfix.length(); x++) {
-					String current = String.valueOf(postfix.charAt(x));
-					
-					if(isOperand(current)) {
-						/*
-						String next = String.valueOf(postfix.charAt(x+1));
-						if(x != postfix.length()-1 && isOperand(next) || next.equals(")"))
-							number += current;
-						else */
-						stack.push(current);
-						addedElements++;
-					}else if(current.equals("(") && addedElements != 0) {
-						addedElements--;
-						
-					}else if(current.equals(")")) {
-						/*
-						stack.push(number);
-						number = "";
-						*/
-						int exponent = 0, limit = 0;
-						while(addedElements > limit++) {
-							temp2 += Math.pow(10,exponent)*(Double.parseDouble(stack.pop()));
-							Thread.sleep(500);
-							exponent++;
-						}
-						
-						stack.push(String.valueOf(temp2));	
-						addedElements = 0;
-						temp2 = 0.0;	
-						
-					}else if(isOperator(current)) {
-						double num1 = Double.parseDouble(stack.pop());
-						Thread.sleep(500);
-						double num2 = Double.parseDouble(stack.pop());
-						Thread.sleep(500);
-						
-						if(current.equals("+")) 
-							answer = num1 + num2;
-						else if(current.equals("-")) 
-							answer = num2 - num1;
-						else if(current.equals("*")) 
-							answer = num1 * num2;
-						else if(current.equals("/")) {
-							if(num1 == 0) {
-								postfix = mathErr;
-								break;
-							}else answer = num2 / num1;
-						}
-						stack.push(String.valueOf(answer));
-						addedElements = 0;
-					} 
-					parsed += current;
-					displaySnapshot(current, parsed, String.valueOf(answer), "    ");
+				for(int i = 0; i < postfix.length(); i++) {
+					output[i] = "";
+					if(postfix.charAt(i) == '(') {
+						isParenthesis = true;
+						output[stCtr] += String.valueOf(postfix.charAt(i));
+					}else if(postfix.charAt(i) == ')') {
+						isParenthesis = false;
+						output[stCtr++] += String.valueOf(postfix.charAt(i));
+					}else{
+						output[stCtr] += String.valueOf(postfix.charAt(i));
+						if(!isParenthesis)
+							stCtr++;
+					}
+				}
+
+				for(int j = 0; j < stCtr; j++) {
+					if(output[j].equals(null))
+						break;
+					else if(output[j].charAt(0) == '(')
+						output[j] = output[j].substring(1, output[j].length()-1);
+				}
+				
+				for(int j = 0; j < stCtr; j++) {
+					if(output[j].equals(null))
+						break;
+					else{
+						if(isOperator(output[j])) {
+							second = Double.parseDouble(stack.pop());
+							first = Double.parseDouble(stack.pop());
+							
+							if(output[j].equals("+")) 
+								out = first + second;
+							else if(output[j].equals("-")) 
+								out = first - second;
+							else if(output[j].equals("*")) 
+								out = first * second;
+							else if(output[j].equals("/")) {
+								out = 0.0;
+								if(second != 0) {
+									out = first / second;
+								}else{
+									postfix = mathErr;
+									break;
+								}
+							}
+							stack.push(Double.toString(out));
+						}else stack.push(output[j]);
+					}
+					parsed += output[j];
+					displaySnapshot(output[j], parsed, String.valueOf(out), "    ");
 					Thread.sleep(500);
-				}	
+				}				
 				displaySnapshot("END", parsed, postfix, "    ");
 				finalAnswer = roundOff(Double.parseDouble(stack.pop()));
 			}
@@ -200,7 +201,9 @@ public class Converter extends Thread {
 		
 		Calculator.screen.setText(output);	
 		System.out.println("\n\n" + output);
+		Calculator.snapshotScreens[0].requestFocusInWindow();
 		Calculator.enableButtons(true);
+		Calculator.isRunning = false;
 		
     }
 	
