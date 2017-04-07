@@ -34,7 +34,7 @@ public class Calculator extends JFrame implements ActionListener {
 	private JPanel labelsPanel;
 	private Converter convert;
 	private JPanel leftPanel;
-	private JTabbedPane tabs;
+	private static JTabbedPane tabs;
 	
 	private int fontSize = 40;
 	public static boolean hasResult;
@@ -204,7 +204,7 @@ public class Calculator extends JFrame implements ActionListener {
 		if(!isRes) {
 			leftPanel.add(animationPanel);
 			tabs.addTab("Animation Panel", animationPanel);
-			tabs.addKeyListener(new KeyHandler());
+			tabs.requestFocus();
 		}else{
 			leftPanel.remove(animationPanel);
 			repaint();
@@ -215,7 +215,7 @@ public class Calculator extends JFrame implements ActionListener {
 			animationPanel.add(labelsPanel, BorderLayout.SOUTH);
 			leftPanel.add(animationPanel);
 			tabs.addTab("Animation Panel", animationPanel);
-			tabs.addKeyListener(new KeyHandler());
+			tabs.requestFocus();
 		}
 		
 		if(string.length() < 25) {
@@ -332,14 +332,14 @@ public class Calculator extends JFrame implements ActionListener {
 	}
 	
 	public static void enableButtons(boolean bool) {
-		
 		for(int x = 0; x < 10; x++)
 			digits[x].setEnabled(bool);
 		for(int x = 0; x < 5; x++) {
 			otherButtons[x].setEnabled(bool);
 			operators[x].setEnabled(bool);
 		}
-		
+		if(bool)
+		tabs.requestFocus();
 	}
 	
 	private void input(String s) {
