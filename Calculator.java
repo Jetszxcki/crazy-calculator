@@ -345,7 +345,7 @@ public class Calculator extends JFrame implements ActionListener {
 	private void input(String s) {
 		
 		if(string.length() <= 27)
-			screen.setFont(new Font("Consolas", Font.PLAIN, fontSize));
+			screen.setFont(new Font("Consolas", Font.PLAIN, 40));
 		else{
 			if(fontSize >= 20)
 				fontSize -= 4;
