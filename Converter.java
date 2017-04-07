@@ -1,6 +1,7 @@
 
 public class Converter extends Thread {
 	
+	public static int threadTime = 500;
 	private String errMessage = "SYNTAX ERROR";
 	private String mathErr = "MATH ERROR";
 	private String finalAnswer = "";
@@ -11,12 +12,12 @@ public class Converter extends Thread {
 	private int left = 0; 
 	private Stack stack;
   
-	public Converter() { stack = new Stack(); }
+	public Converter() {}
   
 	public Converter(String inputString) {
 		
 		this.inputString = inputString;
-		stack = new Stack();
+		stack = new Stack(inputString.length());
 		
 	}	
 	
@@ -27,13 +28,16 @@ public class Converter extends Thread {
 	public static boolean isOperand(String s) {
 		return !s.equals("(") && !s.equals(")") && !isOperator(s) && !s.equals("");
 	}
+	
+	public boolean isError() {
+		return postfix.equals(errMessage) || postfix.equals(mathErr) || left != right;
+	}
 
 	public void run() {
 	
 		try{
-			String temp = "(", parsed = "", previousChar = "", previousOperator = "",  previousOperator2 = "";
-			double answer = 0.0;
-			
+			String temp = "(", parsed = "", previousChar = "", previousOperator = "";
+
 			for(int x = 0; x < inputString.length(); x++) {
 				String current = String.valueOf(inputString.charAt(x));
 
@@ -52,12 +56,10 @@ public class Converter extends Thread {
 						Thread.sleep(500);
 						stack.push(current);
 					}
-					previousOperator2 = previousOperator;
 					previousOperator = current;
 					
 				}else if(current.equals("(")) {
 					if(x == inputString.length()-1 || isOperand(previousChar) || previousChar.equals(")")) {
-						System.out.println("ENTERED");
 						postfix = errMessage;
 						break;
 					}
@@ -110,12 +112,20 @@ public class Converter extends Thread {
 				
 				parsed += current;
 				displaySnapshot(current, parsed, postfix, "    ");
+				
+				int ht1;
+				ht1 = (int)Calculator.structureHolder[0].getPreferredSize().getHeight();
+				
+				if(ht1 != 0) {
+					Calculator.structureHolder[4].revalidate();
+					Calculator.scrollAnim[4].getVerticalScrollBar().setValue(ht1);
+				}
+				
 				previousChar = current;
 				Thread.sleep(500);
 			}
-			
-			if(left != right) postfix = errMessage;			
-			if(!postfix.equals(errMessage) && !postfix.equals(mathErr)) {
+					
+			if(!isError()) {
 				displaySnapshot("END", parsed, postfix, "    ");
 				if(stack.elements != 0) {		
 					for(int k = 0; k <= stack.elements; k++) {
@@ -129,10 +139,8 @@ public class Converter extends Thread {
 				   
 	// +++++++++++++++++++++++++++++++++++++  EVALUATION  ++++++++++++++++++++++++++++++++++++++++++++++
 			
-			
-				int stCtr = 0;
-				double out = 0.0;
-				double first, second;
+				int stringCtr = 0;
+				double first, second, out = 0.0;
 				boolean isParenthesis = false;
 				output = new String[postfix.length()];
 				
@@ -140,25 +148,25 @@ public class Converter extends Thread {
 					output[i] = "";
 					if(postfix.charAt(i) == '(') {
 						isParenthesis = true;
-						output[stCtr] += String.valueOf(postfix.charAt(i));
+						output[stringCtr] += String.valueOf(postfix.charAt(i));
 					}else if(postfix.charAt(i) == ')') {
 						isParenthesis = false;
-						output[stCtr++] += String.valueOf(postfix.charAt(i));
+						output[stringCtr++] += String.valueOf(postfix.charAt(i));
 					}else{
-						output[stCtr] += String.valueOf(postfix.charAt(i));
+						output[stringCtr] += String.valueOf(postfix.charAt(i));
 						if(!isParenthesis)
-							stCtr++;
+							stringCtr++;
 					}
 				}
 
-				for(int j = 0; j < stCtr; j++) {
+				for(int j = 0; j < stringCtr; j++) {
 					if(output[j].equals(null))
 						break;
 					else if(output[j].charAt(0) == '(')
 						output[j] = output[j].substring(1, output[j].length()-1);
 				}
 				
-				for(int j = 0; j < stCtr; j++) {
+				for(int j = 0; j < stringCtr; j++) {
 					if(output[j].equals(null))
 						break;
 					else{
@@ -191,22 +199,23 @@ public class Converter extends Thread {
 					if(output[j].length() == 1)
 						parsed += output[j];
 					else parsed += "(" + output[j] + ")";
+					
 					displaySnapshot(output[j], parsed, String.valueOf(out), "    ");
 					Thread.sleep(500);
 				}				
-				displaySnapshot("END", parsed, postfix, "    ");
+				displaySnapshot("END", parsed, String.valueOf(out), "    ");
 				finalAnswer = roundOff(Double.parseDouble(stack.pop()));
 			}
-		}catch(Exception e){ e.printStackTrace(); }
+			
+		}catch(Exception e) { e.printStackTrace(); }
 		
 		String output;
 		
-		if(postfix.equals(errMessage) || postfix.equals(mathErr))
+		if(isError())
 			output = postfix + "\n\n=> " + inputString;
 		else output = inputString + "\n\n\nPF: " + postfix + "\nA:  " + finalAnswer;
 		
 		Calculator.screen.setText(output);	
-		System.out.println("\n\n" + output);
 		Calculator.snapshotScreens[0].requestFocusInWindow();
 		Calculator.enableButtons(true);
 		Calculator.isRunning = false;
@@ -232,7 +241,6 @@ public class Converter extends Thread {
 		Calculator.snapshotScreens[0].setText(Calculator.snapshotScreens[0].getText() + current + "\n");
 		Calculator.snapshotScreens[1].setText(Calculator.snapshotScreens[1].getText() + parsed + "\n");
 		Calculator.snapshotScreens[2].setText(Calculator.snapshotScreens[2].getText() + postfix + "\n");
-		System.out.print("  " + current + space + parsed + space + postfix + space);
 		stack.display();
 		
 	}
