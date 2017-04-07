@@ -1,11 +1,9 @@
-import java.awt.Font;
 
 public class PseudoArray {
 	
 	private Link first;
 	private Link last;
 	private Link curr;
-	private int count = 0;
 	
 	public PseudoArray(int size) {
 		
@@ -19,7 +17,8 @@ public class PseudoArray {
 			else last.next = newLink;
 			
 			last = newLink;
-			Calculator.structures[3][i].setBackground(Calculator.colors[i]);
+			Calculator.structureItems[3][i].setText("NULL");
+			Calculator.structures[3][i].setBackground(Calculator.colors[i%9]);
 		}
 		Calculator.structureItems[4][0].setText("NULL");
 		curr = first;
@@ -32,16 +31,8 @@ public class PseudoArray {
 	
 	public void add(String item) {
 		
-		Calculator.structureItems[4][count].setFont(new Font("Consolas", Font.BOLD, 10));
-		Calculator.structures[4][count].setBackground(Calculator.colors[count]);
-		Calculator.structureItems[4][count].setText(item + "(" + curr + ")");
-		Calculator.structureItems[4][count+1].setText("NULL");
-		/*
-		Calculator.structureItems[3][count].setText(item);
-		*/
 		curr.setItem(item);
 		curr = curr.next;
-		count++;
 		
 	}
 	
@@ -59,28 +50,7 @@ public class PseudoArray {
 			first = newLink;
 		else last.next = newLink;
 		
-		last = newLink;
-		
-		int counter = count;
-		//Calculator.structureItems[3][count].setText(" ");
-		Calculator.structureItems[4][0].setText(" ");
-		
-		if(count != 0) {			
-			while(counter <= count) {
-				Calculator.structureItems[4][counter-1].setText(Calculator.structureItems[4][counter].getText());
-				Calculator.structures[4][counter-1].setBackground(Calculator.colors[counter-1]);
-				counter++;
-			}
-			Calculator.structureItems[4][count].setText(" ");	
-			Calculator.structures[4][count].setBackground(Calculator.colors[10]);
-		}
-		
-		count--;
-		if(count == 0)  {
-			Calculator.structures[4][0].setBackground(Calculator.colors[10]);
-			//Calculator.structureItems[4][counter].setText("NULL");
-		}
-		
+		last = newLink;		
 		return temp;
 		
 	}
@@ -89,13 +59,13 @@ public class PseudoArray {
 		
 		Link current = first;
 		
-		while(current != null) {
-			Calculator.snapshotScreens[3].setText(Calculator.snapshotScreens[3].getText() + current.getItem());
-			System.out.print(current.getItem());
-			current = current.next;
+		if(Converter.threadTime != 0) {
+			while(current != null) {
+				Calculator.snapshotScreens[3].setText(Calculator.snapshotScreens[3].getText() + current.getItem());
+				current = current.next;
+			}
+			Calculator.snapshotScreens[3].setText(Calculator.snapshotScreens[3].getText() + "\n");
 		}
-		Calculator.snapshotScreens[3].setText(Calculator.snapshotScreens[3].getText() + "\n");
-		System.out.println();
 		
 	}
 	
