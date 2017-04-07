@@ -201,9 +201,11 @@ public class Converter extends Thread {
 					else parsed += "(" + output[j] + ")";
 					
 					displaySnapshot(output[j], parsed, String.valueOf(out), "    ");
+					Calculator.structureHolder[4].revalidate();
 					Thread.sleep(500);
 				}				
 				displaySnapshot("END", parsed, String.valueOf(out), "    ");
+				Calculator.structureHolder[4].revalidate();
 				finalAnswer = roundOff(Double.parseDouble(stack.pop()));
 			}
 			
